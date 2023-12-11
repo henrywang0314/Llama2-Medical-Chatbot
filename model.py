@@ -52,7 +52,7 @@ def load_llm():
     # )
     from langchain.llms import ChatGLM
 
-    llm = ChatGLM(endpoint_url="http://127.0.0.1:8080", max_token=2048, top_p=0.9, temperature=0.1, with_history=False)
+    llm = ChatGLM(endpoint_url="http://127.0.0.1:8080", max_token=2048, top_p=0.9, temperature=0.1, with_history=False, streaming = True)
 
     return llm
 
@@ -93,7 +93,10 @@ async def main(message: cl.Message):
         stream_final_answer=True, answer_prefix_tokens=["FINAL", "ANSWER"]
     )
     cb.answer_reached = True
-    res = await chain.acall(message.content, callbacks=[cb])
+    # res = await chain.acall(message.content, callbacks=[cb])
+    res = await cl.make_async(chain)(
+        message.content, callbacks=[cb]
+)
     answer = res["result"]
     sources = res["source_documents"]
 
